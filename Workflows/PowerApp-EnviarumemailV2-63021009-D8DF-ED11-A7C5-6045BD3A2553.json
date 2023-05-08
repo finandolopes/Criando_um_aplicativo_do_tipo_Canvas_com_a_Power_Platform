@@ -1,0 +1,93 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_outlook": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "curso_sharedoutlook_ab3fd"
+        },
+        "api": {
+          "name": "shared_outlook"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "9d621d92-1f59-4f1b-9a3c-d20c38720ef2"
+          },
+          "type": "Request",
+          "kind": "PowerApp",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Enviarumemail(V2)_Para": {
+                  "type": "string",
+                  "format": "email",
+                  "description": "Especificar endereços de email separados por ponto e vírgula, como nome@contoso.com",
+                  "x-ms-powerflows-param-ispartial": false
+                },
+                "Enviarumemail(V2)_Corpo": {
+                  "type": "string",
+                  "format": "html",
+                  "description": "Especifique o corpo do email. Este parâmetro é usado como parte de \"68EB73A0-A791-4C54-8B4F-1E1AE7119E14\"",
+                  "x-ms-powerflows-param-ispartial": true
+                },
+                "Enviarumemail(V2)_Corpo_1": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "Enviarumemail(V2)_Para",
+                "Enviarumemail(V2)_Corpo",
+                "Enviarumemail(V2)_Corpo_1"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Enviar_um_email_(V2)": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "75e07aa6-29d4-409b-a34a-a59a2066966a"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_outlook",
+              "operationId": "SendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_outlook"
+            },
+            "parameters": {
+              "emailMessage/To": "@triggerBody()['Enviarumemail(V2)_Para']",
+              "emailMessage/Subject": "Novo Curso Habilitado",
+              "emailMessage/Body": "<p>Olá @{triggerBody()['Enviarumemail(V2)_Corpo']},<br>\nO curso @{triggerBody()['Enviarumemail(V2)_Corpo_1']} foi habilitado para que você &nbsp;seja um instrutor.<br>\n<br>\nBoa sorte e bom trabalho,<br>\nEquipe treinamento.</p>",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}
